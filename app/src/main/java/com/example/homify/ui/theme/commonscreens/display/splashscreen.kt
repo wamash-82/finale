@@ -55,9 +55,9 @@ fun SplashScreen(navController: NavController) {
         }
     }
 }
-@Preview(showBackground = true)
-@Composable
-fun splashscreenpreview(){
-    val navController = rememberNavController()
-    SplashScreen(navController = navController)
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun splashscreenpreview(){
+//    val navController = rememberNavController()
+//    SplashScreen(navController = navController)
+//}

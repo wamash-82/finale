@@ -153,9 +153,9 @@ fun HomifyLoginScreen(navController: NavController) {
 //        }
     }
 }
-@Preview(showBackground = true)
-@Composable
-fun HomifyLoginPreview() {
-    val navController = rememberNavController()
-    HomifyLoginScreen(navController = navController)
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun HomifyLoginPreview() {
+//    val navController = rememberNavController()
+//    HomifyLoginScreen(navController = navController)
+//}

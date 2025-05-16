@@ -5,8 +5,6 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -91,7 +89,7 @@ class TenantViewModel: ViewModel() {
     }
 
     fun uploadTenantWithImage(
-        uri: Uri,
+        uri: Uri?,
         context: Context,
         name: String,
         age: String,
@@ -102,7 +100,7 @@ class TenantViewModel: ViewModel() {
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val file = getFileFromUri(context, uri)
+                val file = getFileFromUri(context, uri!!)
                 if (file == null) {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(context, "Failed to process image", Toast.LENGTH_SHORT).show()

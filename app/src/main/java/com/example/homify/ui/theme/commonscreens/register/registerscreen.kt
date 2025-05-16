@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.homify.ui.theme.commonscreens.register
 
 import androidx.compose.foundation.Image
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -36,8 +39,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,24 +53,30 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.homify.R
 import com.example.homify.data.AuthViewModel
+import com.example.homify.navigation.ROUTEDASHBOARD
+import com.example.homify.navigation.ROUTELOGIN
+
 
 @Composable
-fun Register(navController: NavController
-) {
+fun Register(navController: NavController) {
     val authViewModel: AuthViewModel = viewModel()
     var firstname by remember { mutableStateOf("") }
-    var lastname by remember {mutableStateOf("")}
+    var lastname by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var role by remember { mutableStateOf("") }
     val context = LocalContext.current
-    val isRegistered by remember { mutableStateOf(false) }
+    val registrationSuccess by authViewModel.registrationSuccess // Expose this as a State<Boolean> in your ViewModel
 
-
-    LaunchedEffect(isRegistered) {
-        if (isRegistered) {
-            navController.navigate("dashboard") {
-                popUpTo("register") { inclusive = true }
+    LaunchedEffect(registrationSuccess) {
+        if (registrationSuccess) {
+            when (authViewModel.currentUserRole.value) {
+                "Tenant" -> navController.navigate(ROUTEDASHBOARD) {
+                    popUpTo("register") { inclusive = true }
+                }
+                "Landlord" -> navController.navigate("dashboard2") {
+                    popUpTo("register") { inclusive = true }
+                }
             }
         }
     }
@@ -71,7 +84,7 @@ fun Register(navController: NavController
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFE8F5E9)), // Mint green background
+            .background(Color(0xFFE8F5E9)),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -146,11 +159,6 @@ fun Register(navController: NavController
         )
 
         Spacer(modifier = Modifier.height(12.dp))
-        OutlinedTextField(
-            value = role,
-            onValueChange = {role = it},
-            label = {Text("Role")}
-        )
 
         Text("Registering as:", fontWeight = FontWeight.SemiBold)
         Row(
@@ -159,7 +167,7 @@ fun Register(navController: NavController
         ) {
             RadioButton(
                 selected = role == "Tenant",
-                onClick = { navController.navigate("dashboard")}
+                onClick = { role = "Tenant" }
             )
             Text("Tenant")
             Spacer(modifier = Modifier.width(16.dp))
@@ -175,7 +183,7 @@ fun Register(navController: NavController
         Button(
             onClick = {
                 authViewModel.register(firstname, lastname, email, password, role, navController, context)
-                navController.navigate("")
+                // Navigation handled by LaunchedEffect
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -190,15 +198,32 @@ fun Register(navController: NavController
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        TextButton(onClick = { navController.navigate("login_home") }) {
-            Text("Already have an account? Login")
-        }
-
-
+//        ClickableText(
+//            text = AnnotatedString("Already have an account? Login"),
+//            onClick = { navController.navigate(ROUTELOGIN) },
+//            modifier = Modifier.padding(top = 12.dp)
+//        )
+        ClickableText(
+            text = buildAnnotatedString {
+                append("Already have an account? ")
+                withStyle(style = SpanStyle(color = Color(0xFF2E7D32), fontWeight = FontWeight.Bold)) {
+                    append("Login")
+                }
+            },
+            onClick = { offset ->
+                // Only navigate if "Login" is clicked
+                val loginStart = "Already have an account? ".length
+                val loginEnd = loginStart + "Login".length
+                if (offset in loginStart until loginEnd) {
+                    navController.navigate(ROUTELOGIN)
+                }
+            },
+            modifier = Modifier.padding(top = 12.dp)
+        )
     }
 }
-@Preview(showBackground = true)
-@Composable
-fun Registerpreview() {
-    Register(navController = rememberNavController())
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun Registerpreview() {
+//    Register(navController = rememberNavController())
+//}

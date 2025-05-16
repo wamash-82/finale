@@ -12,26 +12,29 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.homify.data.TenantViewModel
 
 @Composable
-fun ViewScreen(tenantViewModel: TenantViewModel) {
-    val viewModel: TenantViewModel = hiltViewModel()
+fun ViewScreen(navController: NavController, tenantViewModel: TenantViewModel = viewModel()) {
+    val tenants = tenantViewModel.tenants.collectAsState().value
 
-    val tenants by viewModel.tenants.collectAsState()
-
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)) {
-
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
         Text("Tenant Payments", style = MaterialTheme.typography.titleLarge)
-
         Spacer(modifier = Modifier.height(16.dp))
 
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
             Text("Name", modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelMedium)
             Text("Unit", modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelMedium)
             Text("Phone", modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelMedium)
@@ -41,7 +44,10 @@ fun ViewScreen(tenantViewModel: TenantViewModel) {
         Divider(modifier = Modifier.padding(vertical = 8.dp))
 
         tenants.forEach { tenant ->
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 Text(tenant.name, modifier = Modifier.weight(1f))
                 Text(tenant.unit, modifier = Modifier.weight(1f))
                 Text(tenant.phone, modifier = Modifier.weight(1f))
@@ -51,4 +57,3 @@ fun ViewScreen(tenantViewModel: TenantViewModel) {
         }
     }
 }
-

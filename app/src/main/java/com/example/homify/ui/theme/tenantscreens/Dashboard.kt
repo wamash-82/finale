@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.ExitToApp
@@ -50,6 +51,7 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.compose.rememberNavController
 import com.example.homify.R
+import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,6 +60,7 @@ fun DashboardScreen(navController: NavController) {
     val context = LocalContext.current
 
     Scaffold(
+        containerColor = Color.Transparent,
         bottomBar = {
             NavigationBar(containerColor = Color(0xFF008080)) {
                 NavigationBarItem(
@@ -79,7 +82,7 @@ fun DashboardScreen(navController: NavController) {
                     onClick = {
                         selectedItem.value = 1
                         val callIntent = Intent(Intent.ACTION_DIAL).apply {
-                            data = Uri.parse("tel:0742904964")
+                            data = "tel:0742904964".toUri()
                         }
                         context.startActivity(callIntent)
                     },
@@ -92,7 +95,7 @@ fun DashboardScreen(navController: NavController) {
                     onClick = {
                         selectedItem.value = 2
                         val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
-                            data = Uri.parse("mailto:support@homify.com")
+                            data = "mailto:support@homify.com".toUri()
                             putExtra(Intent.EXTRA_SUBJECT, "Maintenance Request")
                         }
                         context.startActivity(emailIntent)
@@ -104,77 +107,121 @@ fun DashboardScreen(navController: NavController) {
             }
         }
     ) { innerPadding ->
-        Box(modifier= Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            // Stretch background image to fill the screen
             Image(
                 painter = painterResource(id = R.drawable.background),
                 contentDescription = "background image",
-                contentScale = ContentScale.FillBounds,
-                modifier = Modifier.padding(innerPadding)
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
             )
 
-
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 TopAppBar(
-                    title = { Text("Tenant Dashboard.") },
+                    title = { Text("Tenant Dashboard", fontWeight = FontWeight.Bold) },
                     navigationIcon = {
                         IconButton(onClick = {}) {
                             Icon(Icons.Default.Home, contentDescription = "Home")
                         }
                     },
                     actions = {
-                        IconButton(onClick = { navController.navigate("profile")}) {
+                        IconButton(onClick = { navController.navigate("profile") }) {
                             Icon(Icons.Default.Person, contentDescription = "Profile")
                         }
                         IconButton(onClick = {}) {
-                            Icon(Icons.Default.ExitToApp, contentDescription = "Logout")
+                            Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Logout")
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color(0xFF008080),
+                        containerColor = Color(0xCC008080),
                         titleContentColor = Color.White
-
                     )
                 )
 
-                // Cards Section
-                Column(modifier = Modifier.padding(16.dp)) {
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Grid of Cards
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        DashboardCard("My Rent", onClick = {
-                            navController.navigate("rent")
-                        })
-                        DashboardCard("Maintenance", onClick = {
-                            navController.navigate("maintenance")
-                        })
-                        DashboardCard("Notices", onClick = {
-                            navController.navigate("notices")
-                        })
+                        DashboardCard(
+                            label = "My Rent",
+                            icon = Icons.Default.Home,
+                            onClick = { navController.navigate("rent") },
+                            modifier = Modifier.weight(1f)
+                        )
+                        DashboardCard(
+                            label = "Maintenance",
+                            icon = Icons.Default.Email,
+                            onClick = { navController.navigate("maintenance") },
+                            modifier = Modifier.weight(1f)
+                        )
                     }
-
                     Spacer(modifier = Modifier.height(16.dp))
-
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        DashboardCard("Contact Mgmt", onClick = {
-                            val callIntent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:0700123456"))
-                            context.startActivity(callIntent)
-                        })
-                        DashboardCard("Help", onClick = {
-                            val intent = Intent(Intent.ACTION_SENDTO).apply {
-                                data = Uri.parse("mailto:support@homify.com")
-                            }
-                            context.startActivity(intent)
-                        })
-                        DashboardCard("Profile", onClick = {
-                            navController.navigate("profile")
-                        })
+                        DashboardCard(
+                            label = "Notices",
+                            icon = Icons.Default.Close,
+                            onClick = { navController.navigate("notices") },
+                            modifier = Modifier.weight(1f)
+                        )
+                        DashboardCard(
+                            label = "Contact Mgmt",
+                            icon = Icons.Default.Phone,
+                            onClick = {
+                                val callIntent = Intent(Intent.ACTION_DIAL, "tel:0700123456".toUri())
+                                context.startActivity(callIntent)
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        DashboardCard(
+                            label = "Help",
+                            icon = Icons.Default.Email,
+                            onClick = {
+                                val intent = Intent(Intent.ACTION_SENDTO).apply {
+                                    data = "mailto:support@homify.com".toUri()
+                                }
+                                context.startActivity(intent)
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
+                        DashboardCard(
+                            label = "Profile",
+                            icon = Icons.Default.Person,
+                            onClick = { navController.navigate("profile") },
+                            modifier = Modifier.weight(1f)
+                        )
                     }
                 }
             }
@@ -183,24 +230,31 @@ fun DashboardScreen(navController: NavController) {
 }
 
 @Composable
-fun DashboardCard(label: String, onClick: () -> Unit) {
+fun DashboardCard(label: String, icon: androidx.compose.ui.graphics.vector.ImageVector, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .size(100.dp)
+        modifier = modifier
+            .height(120.dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(6.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF008080))
+        shape = RoundedCornerShape(24.dp),
+        elevation = CardDefaults.cardElevation(10.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xCC008080))
     ) {
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(icon, contentDescription = label, tint = Color.White, modifier = Modifier.size(36.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Text(text = label, color = Color.White, fontWeight = FontWeight.Bold)
         }
     }
 }
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun DashboardPreview() {
-    DashboardScreen(navController = rememberNavController())
-}
+//
+//@Preview(showBackground = true, showSystemUi = true)
+//@Composable
+//fun DashboardPreview() {
+//    DashboardScreen(navController = rememberNavController())
+//}
